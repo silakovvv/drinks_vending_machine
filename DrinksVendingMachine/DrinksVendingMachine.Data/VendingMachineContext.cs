@@ -34,28 +34,27 @@ namespace DrinksVendingMachine.Data
             base.OnConfiguring(optionsBuilder);
         }
 
-        /*protected override void OnModelCreating(ModelBuilder modelBuilder)
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<ListenerTask>(taskBuilder =>
-            {
-                taskBuilder.HasKey(task => task.TaskId);
-                taskBuilder.OwnsOne(task => task.TaskOptions);
-                taskBuilder.Property(task => task.ListenerOptions)
-                    .HasConversion(
-                        options => JsonSerializer.Serialize(options, null),
-                        options => JsonSerializer.Deserialize<ListenerOptions>(options, null));
-            });
+            modelBuilder.Entity<Coin>()
+                .HasKey(coin => coin.Id);
 
-            modelBuilder.Entity<ListenerResult>()
-                    .HasKey(result => result.ResultId);
+            modelBuilder.Entity<Drink>()
+                .HasKey(drink => drink.Id);
 
-            modelBuilder.Entity<ListenerResult>()
-                    .HasOne(result => result.Task)
-                    .WithMany(task => task.Results)
-                    .HasForeignKey(result => result.TaskId);
+            modelBuilder.Entity<CoinTransactions>()
+                .HasKey(transaction => transaction.TransactionId);
+
+            modelBuilder.Entity<VendingMachineOperations>()
+                .HasKey(operation => operation.OperationId);
+
+            modelBuilder.Entity<VendingMachineOperations>()
+                .HasOne(operation => operation.DrinkProduct)
+                .WithMany(drink => drink.Operations)
+                .HasForeignKey(result => result.DrinkId);
 
             base.OnModelCreating(modelBuilder);
-        }*/
+        }
 
         public DbSet<VendingMachineContext> Coin { get; set; }
         public DbSet<VendingMachineContext> Drink { get; set; }
