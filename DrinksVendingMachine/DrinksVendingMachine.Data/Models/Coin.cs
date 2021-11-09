@@ -12,5 +12,6 @@ namespace DrinksVendingMachine.Data.Models
         public string Name { get; set; }
         public string SchortName { get; set; }
         public bool Locked { get; set; }
+        public int Balance { get; set; }
     }
 }
