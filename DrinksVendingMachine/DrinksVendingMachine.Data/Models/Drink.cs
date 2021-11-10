@@ -14,6 +14,6 @@ namespace DrinksVendingMachine.Data.Models
         public byte[] Image { get; set; }
         public decimal Price { get; set; }
         public int Amount { get; set; }
-        public List<VendingMachineOperations> Operations { get; set; }
+        public List<VendingMachineOperation> Operations { get; set; }
     }
 }

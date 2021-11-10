@@ -11,7 +11,8 @@ namespace DrinksVendingMachine.Data.Models
         public int Id { get; set; }
         public string Name { get; set; }
         public string SchortName { get; set; }
+        public decimal Cost { get; set; }
         public bool Locked { get; set; }
-        public int Balance { get; set; }
+        public List<CoinTransaction> Transactions { get; set; }
     }
 }

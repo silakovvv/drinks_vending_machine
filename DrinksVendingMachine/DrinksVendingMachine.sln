@@ -4,8 +4,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 16.0.31729.503
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DrinksVendingMachine.Web.React", "DrinksVendingMachine.Web.React\DrinksVendingMachine.Web.React.csproj", "{A900E78C-F2B2-4DD2-8231-B5489F08947A}"
+	ProjectSection(ProjectDependencies) = postProject
+		{124F8096-5230-4638-B97D-C7216CAD1CDD} = {124F8096-5230-4638-B97D-C7216CAD1CDD}
+	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DrinksVendingMachine.Data", "DrinksVendingMachine.Data\DrinksVendingMachine.Data.csproj", "{124F8096-5230-4638-B97D-C7216CAD1CDD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DrinksVendingMachine.Data", "DrinksVendingMachine.Data\DrinksVendingMachine.Data.csproj", "{124F8096-5230-4638-B97D-C7216CAD1CDD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

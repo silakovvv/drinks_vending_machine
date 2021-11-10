@@ -42,14 +42,19 @@ namespace DrinksVendingMachine.Data
             modelBuilder.Entity<Drink>()
                 .HasKey(drink => drink.Id);
 
-            modelBuilder.Entity<CoinTransactions>()
+            modelBuilder.Entity<CoinTransaction>()
                 .HasKey(transaction => transaction.TransactionId);
 
-            modelBuilder.Entity<VendingMachineOperations>()
+            modelBuilder.Entity<CoinTransaction>()
+                .HasOne(transaction => transaction.CoinLink)
+                .WithMany(coin => coin.Transactions)
+                .HasForeignKey(transaction => transaction.CoinId);
+
+            modelBuilder.Entity<VendingMachineOperation>()
                 .HasKey(operation => operation.OperationId);
 
-            modelBuilder.Entity<VendingMachineOperations>()
-                .HasOne(operation => operation.DrinkProduct)
+            modelBuilder.Entity<VendingMachineOperation>()
+                .HasOne(operation => operation.DrinkLink)
                 .WithMany(drink => drink.Operations)
                 .HasForeignKey(result => result.DrinkId);
 

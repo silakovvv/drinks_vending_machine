@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 
 namespace DrinksVendingMachine.Data.Models
 {
-    public class VendingMachineOperations
+    public class VendingMachineOperation
     {
         public int OperationId { get; set; }
         public DateTime ProcessingDate { get; set; }
-        public Drink DrinkProduct { get; set; }
+        public Drink DrinkLink { get; set; }
         public int DrinkId { get; set; }
         public int Amount { get; set; }
         public decimal Sum { get; set; }
