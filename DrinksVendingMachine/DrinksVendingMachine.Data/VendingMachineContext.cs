@@ -22,7 +22,7 @@ namespace DrinksVendingMachine.Data
             _connectionString = DataSettings.Default.VendingMachineConnection;
         }
 
-        internal VendingMachineContext(string connectionString)
+        public VendingMachineContext(string connectionString)
         {
             _connectionString = connectionString;
         }

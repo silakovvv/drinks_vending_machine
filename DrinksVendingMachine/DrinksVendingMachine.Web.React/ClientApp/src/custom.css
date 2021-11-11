@@ -12,3 +12,12 @@ code {
   background-color: #1b6ec2;
   border-color: #1861ac;
 }
+
+.btn-coin {
+    color: white;
+    border-radius: 50%;
+    font-size: 1.3em;
+    margin-left: 25px;
+    height: 70px;
+    width: 70px;
+}
