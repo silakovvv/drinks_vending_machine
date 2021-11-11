@@ -22,7 +22,7 @@ namespace DrinksVendingMachine.Data
             _connectionString = DataSettings.Default.VendingMachineConnection;
         }
 
-        public VendingMachineContext(string connectionString)
+        internal VendingMachineContext(string connectionString)
         {
             _connectionString = connectionString;
         }
@@ -31,6 +31,7 @@ namespace DrinksVendingMachine.Data
         {
             optionsBuilder.UseSqlServer(
                 this._connectionString ?? @"Server=.\SQLExpress;Database=VendingMachine;Trusted_Connection=True;MultipleActiveResultSets=true");
+            
             base.OnConfiguring(optionsBuilder);
         }
 
@@ -61,7 +62,10 @@ namespace DrinksVendingMachine.Data
             base.OnModelCreating(modelBuilder);
         }
 
-        public DbSet<VendingMachineContext> Coin { get; set; }
-        public DbSet<VendingMachineContext> Drink { get; set; }
+        public DbSet<Coin> Coin { get; set; }
+        public DbSet<Drink> Drink { get; set; }
+        public DbSet<CoinTransaction> CoinTransaction { get; set; }
+        public DbSet<VendingMachineOperation> VendingMachineOperation { get; set; }
+
     }
 }
