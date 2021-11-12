@@ -8,6 +8,6 @@ namespace DrinksVendingMachine.Web.React.Data
 {
     public interface IVendingMachineRepository
     {
-        Task<IEnumerable<Coin>> GetCoinsAsync();
+        Task<IEnumerable<Coin>> GetListOfCoinsAsync();
     }
 }

@@ -7,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.EntityFrameworkCore;
 using DrinksVendingMachine.Data;
+using DrinksVendingMachine.Web.React.Data;
 
 namespace DrinksVendingMachine.Web.React
 {
@@ -33,6 +34,8 @@ namespace DrinksVendingMachine.Web.React
             {
                 configuration.RootPath = "ClientApp/build";
             });
+
+            services.AddTransient<IVendingMachineRepository, VendingMachineRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

@@ -15,9 +15,10 @@ code {
 
 .btn-coin {
     color: white;
+    border-color: #d7a306;
     border-radius: 50%;
-    font-size: 1.3em;
-    margin-left: 25px;
+    font-size: 1.5em;
+    margin-left: 15px;
     height: 70px;
     width: 70px;
 }

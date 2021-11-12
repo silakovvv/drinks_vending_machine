@@ -23,7 +23,7 @@ namespace DrinksVendingMachine.Web.React.Data
             return new VendingMachineContext(_configuration.GetConnectionString("VendingMachineConnection"));
         }
 
-        public async Task<IEnumerable<Coin>> GetCoinsAsync()
+        public async Task<IEnumerable<Coin>> GetListOfCoinsAsync()
         {
             await using var context = CreateContext();
             return await context.Coin.OrderBy(t => t.Cost).ToListAsync();
