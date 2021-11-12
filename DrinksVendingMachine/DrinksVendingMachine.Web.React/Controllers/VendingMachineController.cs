@@ -31,5 +31,12 @@ namespace DrinksVendingMachine.Web.React.Controllers
         {
             return await _vendingMachineRepository.GetListOfCoinsAsync();
         }
+
+        [HttpPost]
+        [Route("[action]")]
+        public async Task<Dictionary<Drink, int>> DictionaryOfDrinksWithBalanceAsync()
+        {
+            return await _vendingMachineRepository.GetDictionaryOfDrinksWithBalanceAsync();
+        }
     }
 }

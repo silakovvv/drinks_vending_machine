@@ -13,6 +13,11 @@ code {
   border-color: #1861ac;
 }
 
+.increase-deposited {
+    font-size: 2em;
+    margin-left: 15px;
+}
+
 .btn-coin {
     color: white;
     border-color: #d7a306;
@@ -21,4 +26,15 @@ code {
     margin-left: 15px;
     height: 70px;
     width: 70px;
+}
+
+.drink-cards .card {
+    margin: 1%;
+    padding: 0;
+    flex: 0 0 25%;
+    max-width: 23%;
+}
+
+.drink-cards .card-body {
+    padding: 5px;
 }

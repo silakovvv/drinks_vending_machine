@@ -28,5 +28,24 @@ namespace DrinksVendingMachine.Web.React.Data
             await using var context = CreateContext();
             return await context.Coin.OrderBy(t => t.Cost).ToListAsync();
         }
+
+        public async Task<Dictionary<Drink, int>> GetDictionaryOfDrinksWithBalanceAsync()
+        {
+            var dictionaryOfDrinks = new Dictionary<Drink, int>();
+
+            await using var context = CreateContext();
+            var listOfDrinks = await context.Drink.ToListAsync();
+
+            foreach (var drink in listOfDrinks)
+            {
+                dictionaryOfDrinks.Add(
+                    drink,
+                    context.VendingMachineOperation.Where(operation => operation.DrinkId == drink.Id)
+                                                   .Sum(operation => operation.Amount)
+                );
+            }
+
+            return dictionaryOfDrinks;
+        }
     }
 }
