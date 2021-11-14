@@ -38,5 +38,19 @@ namespace DrinksVendingMachine.Web.React.Controllers
         {
             return await _vendingMachineRepository.GetDictionaryOfDrinksWithBalanceAsync();
         }
+
+        [HttpGet("change")]
+        public async Task<Dictionary<Coin, int>> GetChangeInCoinsAsync(int change)
+        {
+            return await _vendingMachineRepository.GetChangeInCoinsAsync(change);
+        }
+
+        [HttpPost]
+        [Route("[action]")]
+        public async Task<bool> MakePurchaseOperationAsync([FromBody] PurchaseOperation purchaseOperation)
+        {
+            return await _vendingMachineRepository.MakePurchaseOperationAsync(purchaseOperation.ArrayOfCoinTransactions,
+                                                                              purchaseOperation.ArrayOfVendingMachineOperations);
+        }
     }
 }

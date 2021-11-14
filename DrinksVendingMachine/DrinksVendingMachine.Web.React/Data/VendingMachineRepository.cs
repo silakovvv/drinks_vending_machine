@@ -47,5 +47,78 @@ namespace DrinksVendingMachine.Web.React.Data
 
             return dictionaryOfDrinks;
         }
+
+        public async Task<Dictionary<Coin, int>> GetChangeInCoinsAsync(int change)
+        {
+            if (change == 0)
+            {
+                return null;
+            }
+
+            var dictionaryAmountOfCoins = new Dictionary<Coin, int>();
+
+            var dictionaryRestOfCoins = await GetRestOfCoinsAsync();
+
+            foreach (var item in dictionaryRestOfCoins)
+            {
+                if (change == 0)
+                {
+                    break;
+                }
+
+                int[] arrayOfValue = { (int)(change / item.Key.Cost), item.Value };
+                int amountOfCurrentCoin = arrayOfValue.Min();
+
+                change -= amountOfCurrentCoin * (int)item.Key.Cost;
+
+                dictionaryRestOfCoins.Add(item.Key, amountOfCurrentCoin);
+            }
+
+            return dictionaryAmountOfCoins;
+        }
+
+        public async Task<Dictionary<Coin, int>> GetRestOfCoinsAsync()
+        {
+            var dictionaryRestOfCoins = new Dictionary<Coin, int>();
+
+            await using var context = CreateContext();
+            var listOfCoins = await context.Coin.ToListAsync();
+
+            foreach (var coin in listOfCoins)
+            {
+                dictionaryRestOfCoins.Add(
+                    coin,
+                    (int)context.CoinTransaction.Where(transaction => transaction.CoinId == coin.Id)
+                                                .Sum(transaction => transaction.Amount)
+                );
+            }
+
+            return dictionaryRestOfCoins;
+        }
+
+        public async Task<bool> MakePurchaseOperationAsync(CoinTransaction[] coinTransactions, VendingMachineOperation[] vendingMachineOperations)
+        {
+            await using var context = CreateContext();
+
+            try
+            {
+                foreach (var transaction in coinTransactions)
+                {
+                    context.CoinTransaction.Add(transaction);
+                }
+                foreach (var operation in vendingMachineOperations)
+                {
+                    context.VendingMachineOperation.Add(operation);
+                }
+            }
+            catch
+            {
+                return false;
+            }
+                
+            context.SaveChanges();
+
+            return true;
+        }
     }
 }
