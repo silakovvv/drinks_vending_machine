@@ -1,7 +1,7 @@
 import React, { Component, useState } from 'react';
 import {
-    Col, Row, Form, FormGroup, Label, Input, InputGroup, InputGroupAddon, Button, ButtonGroup, ButtonToolbar,
-    CardGroup, Card, CardImg, CardBody, CardTitle, CardSubtitle, CardText, Modal, ModalHeader, ModalBody, ModalFooter
+    Col, Row, Form, FormGroup, Label, Button, Card, CardImg, CardBody, CardTitle,
+    CardSubtitle, CardText, Modal, ModalHeader, ModalBody, ModalFooter
 } from 'reactstrap';
 
 export class Home extends Component {
@@ -9,7 +9,7 @@ export class Home extends Component {
         super(props);
         this.state = {
             listOfCoins: [],
-            dictionaryOfDrinks: [],
+            listOfDrinks: [],
             depositedAmount: 0,
             depositedCoin: {},
             changeInCoins: [],
@@ -59,14 +59,15 @@ export class Home extends Component {
             return;
         }
 
-        let result = await this.makePurchaseOperation();
-
-        if (!result || this.state.depositedAmount === 0) {
-            return;
+        if (!(this.state.depositedAmount === 0)) {
+            await this.getChangeInCoins();
         }
-
-        this.getChangeInCoins(this.state.depositedAmount);
+        this.makePurchaseOperation();
+        
         this.populateListOfDrinks();
+        this.setState({
+            selectedDrinks: [],
+        })
     }
 
     render () {
@@ -104,39 +105,6 @@ export class Home extends Component {
                     </Col>
                 </Row>
                 <Row>
-                    <Col sm={12}>
-                        <Col sm={9}>
-                            <Row>
-                                {this.state.changeInCoins.map(element => {
-                                    let listOfChangeInCoin;
-                                    for (let i = 1; i <= element.value; i++) {
-                                        listOfChangeInCoin += <Button
-                                                                    className="btn-coin"
-                                                                    disabled>
-                                                                    element.key.schortName
-                                                                </Button>
-                                    }
-                                    return listOfChangeInCoin;
-                                })}
-                            </Row>
-                        </Col>
-                        <Col sm={3}>
-                            {!(this.state.changeInCoins.length === 0) && (
-                                <Button
-                                    className="btn-confirmation-purchase"
-                                    color="success"
-                                    onClick={(evt) => {
-                                        evt.preventDefault();
-                                        this.setState({
-                                            changeInCoins: []
-                                        })
-                                    }}>
-                                    Забрать сдачу
-                                </Button>)}
-                        </Col>
-                    </Col>
-                </Row>
-                <Row>
                     <Modal isOpen={this.state.openFormErrorNotEnoughFunds}>
                         <ModalHeader>Не удалось выбрать напиток.</ModalHeader>
                         <ModalBody>
@@ -153,10 +121,10 @@ export class Home extends Component {
                 <Row>
                     <Col sm={12}>
                         <Row className="drink-cards">
-                            {this.state.dictionaryOfDrinks.map(element =>
+                            {this.state.listOfDrinks.map(drink =>
                                 <Card
                                     onClick={(evt) => {
-                                        evt.preventDefault(); this.chooseDrink(element.key.Id, element.key.Price, element.value);
+                                        evt.preventDefault(); this.chooseDrink(drink.id, drink.price, drink.balance);
                                     }}
                                 >
                                     <CardImg
@@ -165,20 +133,20 @@ export class Home extends Component {
                                         top
                                         width="100%"
                                     />
-                                    <CardBody>
+                                    <CardBody className={this.state.selectedDrinks.includes(drink.id) ? "selected-card" : ""}>
                                         <CardTitle className="text-center" tag="h5">
-                                            {element.key.Name}
+                                            {drink.name}
                                         </CardTitle>
                                         <CardSubtitle
                                             className="mb-2 text-muted"
                                             tag="h6"
                                         >
-                                            Цена: {element.key.Price}
+                                            Цена: {drink.price}
                                         </CardSubtitle>
                                         <CardText
                                             className="text-muted"
                                         >
-                                            Остаток: {element.value}
+                                            Остаток: {drink.balance}
                                         </CardText>
                                     </CardBody>
                                 </Card>)}
@@ -186,6 +154,37 @@ export class Home extends Component {
                     </Col>
                 </Row>
                 <Row>
+                    <Col sm={12}>
+                        <Row>
+                            <Col sm={4}>
+                                {!(Object.keys(this.state.changeInCoins).length === 0) && (
+                                    <Button
+                                        className="btn-confirmation-purchase"
+                                        color="success"
+                                        onClick={(evt) => {
+                                            evt.preventDefault();
+                                            this.setState({
+                                                changeInCoins: []
+                                            })
+                                        }}>
+                                        Забрать сдачу
+                                    </Button>)}
+                            </Col>
+                            <Col sm={8}>
+                                <Row>
+                                    {Object.keys(this.state.changeInCoins).map(item => {
+                                        let listOfChangeInCoin = [];
+                                        for (let i = 1; i <= this.state.changeInCoins[item]; i++) {
+                                            listOfChangeInCoin.push(<Button className="btn-coin">
+                                                {item}
+                                            </Button>);
+                                        }
+                                        return listOfChangeInCoin;
+                                    })}
+                                </Row>
+                            </Col>
+                        </Row>
+                    </Col>
                 </Row>
             </Form>
         );
@@ -197,8 +196,8 @@ export class Home extends Component {
     }
 
     async populateListOfDrinks() {
-        const data = await this.executePostRequest('vendingMachine/dictionaryOfDrinksWithBalance');
-        this.setState({ dictionaryOfDrinks: data });
+        const data = await this.executePostRequest('vendingMachine/listOfDrinksWithBalance');
+        this.setState({ listOfDrinks: data });
     }
 
     async executePostRequest(query) {
@@ -214,27 +213,33 @@ export class Home extends Component {
     }
 
     async makePurchaseOperation() {
-        let arrayOfCoinTransactions = [];
-        this.state.depositedCoin.map(item => arrayOfCoinTransactions.push(
+        var arrayOfCoinTransactions = [];
+        Object.keys(this.state.depositedCoin).map(item => arrayOfCoinTransactions.push(
             {
                 'processingDate': new Date(),
-                'coinId': item.key,
-                'amount': item.value,
+                'coinId': parseInt(item),
+                'amount': parseInt(this.state.depositedCoin[item]),
             }));
-
-        let arrayOfVendingMachineOperations = [];
+        Object.keys(this.state.changeInCoins).map(item => arrayOfCoinTransactions.push(
+            {
+                'processingDate': new Date(),
+                'coinId': this.state.listOfCoins.filter(coin => coin.schortName === item)[0].id,
+                'amount': parseInt(this.state.changeInCoins[item]) * (-1),
+            }));
+        
+        var arrayOfVendingMachineOperations = [];
         this.state.selectedDrinks.map(drink => arrayOfVendingMachineOperations.push(
             {
                 'processingDate': new Date(),
                 'drinkId': drink,
-                'amount': 1,
-                'sum': this.state.dictionaryOfDrinks.filter(item => item.id === drink).price,
+                'amount': -1,
+                'sum': this.state.listOfDrinks.filter(item => item.id === drink)[0].price,
             }));
-
+        
         const response = await fetch('vendingMachine/makePurchaseOperation', {
             method: 'POST',
             headers: {
-                'Accept': 'application/json',
+                'Accept': 'app//lication/json',
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
@@ -243,12 +248,11 @@ export class Home extends Component {
             })
         });
         const result = await response.json();
-
-        return result;
+        console.log(result);
     }
 
-    async getChangeInCoins(change) {
-        let query = 'vendingMachine/changeInCoins?change=' + encodeURIComponent(change);
+    async getChangeInCoins() {
+        let query = 'vendingMachine/change?change=' + encodeURIComponent(this.state.depositedAmount);
 
         const response = await fetch(query, {
             method: 'GET',
@@ -258,6 +262,7 @@ export class Home extends Component {
             }
         });
         const data = await response.json();
+
         this.setState({
             changeInCoins: data,
             depositedAmount: 0,

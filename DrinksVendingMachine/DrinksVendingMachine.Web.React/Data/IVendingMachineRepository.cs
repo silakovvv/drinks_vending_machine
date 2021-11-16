@@ -9,8 +9,8 @@ namespace DrinksVendingMachine.Web.React.Data
     public interface IVendingMachineRepository
     {
         Task<IEnumerable<Coin>> GetListOfCoinsAsync();
-        Task<Dictionary<Drink, int>> GetDictionaryOfDrinksWithBalanceAsync();
-        Task<Dictionary<Coin, int>> GetChangeInCoinsAsync(int depositedAmount);
+        Task<List<Drink>> GetListOfDrinksWithBalanceAsync();
+        Task<Dictionary<string, int>> GetChangeInCoinsAsync(int depositedAmount);
         Task<bool> MakePurchaseOperationAsync(CoinTransaction[] coinTransactions, VendingMachineOperation[] vendingMachineOperations);
     }
 }

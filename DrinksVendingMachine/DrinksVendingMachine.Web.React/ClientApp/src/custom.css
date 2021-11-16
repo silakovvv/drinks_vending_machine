@@ -54,3 +54,7 @@ code {
 .drink-cards .card-body {
     padding: 5px;
 }
+
+.selected-card {
+    background-color: #a1ff97;
+}

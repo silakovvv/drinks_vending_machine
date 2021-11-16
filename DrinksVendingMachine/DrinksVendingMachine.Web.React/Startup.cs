@@ -36,6 +36,7 @@ namespace DrinksVendingMachine.Web.React
             });
 
             services.AddTransient<IVendingMachineRepository, VendingMachineRepository>();
+            services.AddTransient<IAdministrationRepository, AdministrationRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

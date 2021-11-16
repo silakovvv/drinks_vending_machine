@@ -34,13 +34,13 @@ namespace DrinksVendingMachine.Web.React.Controllers
 
         [HttpPost]
         [Route("[action]")]
-        public async Task<Dictionary<Drink, int>> DictionaryOfDrinksWithBalanceAsync()
+        public async Task<List<Drink>> ListOfDrinksWithBalanceAsync()
         {
-            return await _vendingMachineRepository.GetDictionaryOfDrinksWithBalanceAsync();
+            return await _vendingMachineRepository.GetListOfDrinksWithBalanceAsync();
         }
 
         [HttpGet("change")]
-        public async Task<Dictionary<Coin, int>> GetChangeInCoinsAsync(int change)
+        public async Task<Dictionary<string, int>> GetChangeInCoinsAsync(int change)
         {
             return await _vendingMachineRepository.GetChangeInCoinsAsync(change);
         }

@@ -29,71 +29,67 @@ namespace DrinksVendingMachine.Web.React.Data
             return await context.Coin.OrderBy(t => t.Cost).ToListAsync();
         }
 
-        public async Task<Dictionary<Drink, int>> GetDictionaryOfDrinksWithBalanceAsync()
+        public async Task<List<Drink>> GetListOfDrinksWithBalanceAsync()
         {
-            var dictionaryOfDrinks = new Dictionary<Drink, int>();
-
             await using var context = CreateContext();
             var listOfDrinks = await context.Drink.ToListAsync();
 
-            foreach (var drink in listOfDrinks)
+            for (int i = 0; i < listOfDrinks.Count; i++)
             {
-                dictionaryOfDrinks.Add(
-                    drink,
-                    context.VendingMachineOperation.Where(operation => operation.DrinkId == drink.Id)
-                                                   .Sum(operation => operation.Amount)
-                );
+                listOfDrinks[i].Balance = context.VendingMachineOperation
+                                                 .Where(operation => operation.DrinkId == listOfDrinks[i].Id)
+                                                 .Sum(operation => operation.Amount);
             }
 
-            return dictionaryOfDrinks;
+            return listOfDrinks;
         }
 
-        public async Task<Dictionary<Coin, int>> GetChangeInCoinsAsync(int change)
+        public async Task<Dictionary<string, int>> GetChangeInCoinsAsync(int change)
         {
             if (change == 0)
             {
                 return null;
             }
 
-            var dictionaryAmountOfCoins = new Dictionary<Coin, int>();
+            var dictionaryAmountOfCoins = new Dictionary<string, int>();
 
-            var dictionaryRestOfCoins = await GetRestOfCoinsAsync();
+            var listOfCoins = await GetListOfCoinsWithBalanceAsync();
 
-            foreach (var item in dictionaryRestOfCoins)
+            for (int i = 0; i < listOfCoins.Count; i++)
             {
                 if (change == 0)
                 {
                     break;
                 }
+                else if (change / (int)listOfCoins[i].Cost == 0)
+                {
+                    continue;
+                }
 
-                int[] arrayOfValue = { (int)(change / item.Key.Cost), item.Value };
-                int amountOfCurrentCoin = arrayOfValue.Min();
+                decimal[] arrayOfValue = { change / listOfCoins[i].Cost, listOfCoins[i].Balance };
+                int amountOfCurrentCoin = (int)arrayOfValue.Min();
 
-                change -= amountOfCurrentCoin * (int)item.Key.Cost;
+                change -= amountOfCurrentCoin * (int)listOfCoins[i].Cost;
 
-                dictionaryRestOfCoins.Add(item.Key, amountOfCurrentCoin);
+                dictionaryAmountOfCoins.Add(listOfCoins[i].SchortName, amountOfCurrentCoin);
             }
 
             return dictionaryAmountOfCoins;
         }
 
-        public async Task<Dictionary<Coin, int>> GetRestOfCoinsAsync()
+        public async Task<List<Coin>> GetListOfCoinsWithBalanceAsync()
         {
-            var dictionaryRestOfCoins = new Dictionary<Coin, int>();
-
             await using var context = CreateContext();
-            var listOfCoins = await context.Coin.ToListAsync();
+            var listOfCoins = await context.Coin.OrderByDescending(coin => coin.Cost).ToListAsync();
 
-            foreach (var coin in listOfCoins)
+            for (int i = 0; i < listOfCoins.Count; i++)
             {
-                dictionaryRestOfCoins.Add(
-                    coin,
-                    (int)context.CoinTransaction.Where(transaction => transaction.CoinId == coin.Id)
-                                                .Sum(transaction => transaction.Amount)
-                );
+                listOfCoins[i].Balance = context.CoinTransaction
+                                                .Where(transaction => transaction.CoinId == listOfCoins[i].Id)
+                                                .Sum(transaction => transaction.Amount);
             }
 
-            return dictionaryRestOfCoins;
+            return listOfCoins;
         }
 
         public async Task<bool> MakePurchaseOperationAsync(CoinTransaction[] coinTransactions, VendingMachineOperation[] vendingMachineOperations)
@@ -110,13 +106,13 @@ namespace DrinksVendingMachine.Web.React.Data
                 {
                     context.VendingMachineOperation.Add(operation);
                 }
+
+                context.SaveChanges();
             }
             catch
             {
                 return false;
             }
-                
-            context.SaveChanges();
 
             return true;
         }
