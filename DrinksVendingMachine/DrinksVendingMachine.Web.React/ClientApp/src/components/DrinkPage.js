@@ -1,6 +1,6 @@
 import React, { Component, useState } from 'react';
 import {
-    Button, Form, FormGroup, Label, Input, Row, Col, FormText
+    Button, Form, FormGroup, Label, Input, Row, Col, FormText, Card, CardImg
 } from 'reactstrap';
 
 export class DrinkPage extends Component {
@@ -11,6 +11,9 @@ export class DrinkPage extends Component {
             drinkName: "",
             description: "",
             price: 0,
+            image: null,
+            imageInBase64: '',
+            imageChanged: false,
             savedDrink: false,
         };
     }
@@ -24,7 +27,18 @@ export class DrinkPage extends Component {
         this.setState({ [name]: value });
     }
 
-    render () {
+    onImageChange(evt) {
+        if (evt.target.files && evt.target.files[0]) {
+            const fileImage = evt.target.files[0];
+
+            this.setState({
+                image: URL.createObjectURL(fileImage),
+                imageChanged: true,
+            });
+        }
+    }
+
+    render() {
         return (
             <Col sm={12}>
                 <Row>
@@ -86,13 +100,22 @@ export class DrinkPage extends Component {
                                     id="imageFile"
                                     name="imageFile"
                                     type="file"
+                                    accept=".jpg"
+                                    onChange={(evt) => { this.onImageChange(evt) }}
                                 />
                                 <FormText>
-                                    Выберите файл картинки напитка
+                                    Необходимо выбрать файл с расширением JPG.
                                 </FormText>
                             </FormGroup>
                         </Col>
                         <Col sm={6}>
+                            {(!(this.state.image == null) || !(this.state.imageInBase64 === null))
+                                && (<img
+                                        alt="image of drink"
+                                        id="imageOfDrink"
+                                        src={this.state.imageChanged ? this.state.image : 'data:image/jpg;base64,' + this.state.imageInBase64}
+                                        width="100%"
+                                />)}
                         </Col>
                     </Form>
                 </Row>
@@ -120,6 +143,7 @@ export class DrinkPage extends Component {
             drinkName: data.name,
             description: data.description,
             price: data.price,
+            imageInBase64: data.image,
         });
     }
 
@@ -131,15 +155,30 @@ export class DrinkPage extends Component {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                drinkId: this.state.drinkId,
-                drinkName: this.state.drinkName,
+                id: this.state.drinkId,
+                name: this.state.drinkName,
                 description: this.state.description,
-                price: this.state.price
+                price: this.state.price,
+                imageInBase64: this.state.imageChanged ? this.getImageAsBase64String() : this.state.imageInBase64,
             })
         });
         const data = await response.json();
         this.setState({ savedDrink: data });
 
-        this.props.saveTask();
+        this.props.saveDrink();
+    }
+
+    getImageAsBase64String() {
+        var canvas = document.createElement('canvas');
+        var objImage = document.getElementById('imageOfDrink');
+
+        canvas.height = objImage.height;
+        canvas.width = objImage.width;
+        var context = canvas.getContext('2d');
+
+        context.drawImage(objImage, 0, 0);
+        var base64String = canvas.toDataURL();
+
+        return base64String;
     }
 }

@@ -92,6 +92,12 @@ namespace DrinksVendingMachine.Web.React.Data
         {
             await using var context = CreateContext();
 
+            if (!String.IsNullOrEmpty(drink.ImageInBase64))
+            {
+                drink.ImageInBase64 = drink.ImageInBase64.Replace("data:image/jpg;base64,", "");
+                drink.Image = System.Convert.FromBase64String(drink.ImageInBase64);
+            }
+
             if (drink.Id == 0)
             {
                 context.Drink.Add(drink);

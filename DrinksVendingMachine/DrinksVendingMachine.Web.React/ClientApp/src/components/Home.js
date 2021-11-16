@@ -129,7 +129,7 @@ export class Home extends Component {
                                 >
                                     <CardImg
                                         alt="image of drink"
-                                        src="https://picsum.photos/318/180"
+                                        src={(drink.imageInBase64 === null) ? "https://picsum.photos/318/180" : 'data:image/jpg;base64,' + drink.image}
                                         top
                                         width="100%"
                                     />

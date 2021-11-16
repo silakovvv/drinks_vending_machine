@@ -87,9 +87,9 @@ export class AdministrationPage extends Component {
                                                 <tr key={coin.id}>
                                                     <th scope="row">{coin.id}</th>
                                                     <td>{coin.name}</td>
-                                                    <td>{coin.schortName}</td>
-                                                    <td>{coin.cost}</td>
-                                                    <td>
+                                                    <td className="text-center">{coin.schortName}</td>
+                                                    <td className="text-center">{coin.cost}</td>
+                                                    <td className="text-center">
                                                         <Input
                                                             className="form-check-input"
                                                             type="checkbox"
@@ -98,7 +98,7 @@ export class AdministrationPage extends Component {
                                                             onChange={(evt) => { this.changeFlagLocked(coin.id, !coin.locked) }}
                                                         />
                                                     </td>
-                                                    <td>{coin.Balance}</td>
+                                                    <td className="text-center">{coin.balance}</td>
                                                     <td>
                                                         <Row>
                                                             <Button color="danger" style={{ margin: 2 }}
@@ -116,7 +116,7 @@ export class AdministrationPage extends Component {
                                                                     });
                                                                 }}>-</Button>
                                                             <Button color="success" style={{ margin: 2 }}
-                                                                onClick={(evt, coin) => {
+                                                                onClick={(evt) => {
                                                                     evt.preventDefault();
                                                                     this.setState({
                                                                         paramToChangeBalance: {
@@ -179,12 +179,12 @@ export class AdministrationPage extends Component {
                                                     <th scope="row">{drink.id}</th>
                                                     <td>{drink.name}</td>
                                                     <td>{drink.description}</td>
-                                                    <td>{drink.Price}</td>
-                                                    <td>{drink.Balance}</td>
-                                                    <td>
-                                                        <Row>
+                                                    <td className="text-center">{drink.price}</td>
+                                                    <td className="text-center">{drink.balance}</td>
+                                                    <td className="text-right">
+                                                        <div>
                                                             <Button color="danger" style={{ margin: 2 }}
-                                                                onClick={(evt, drink) => {
+                                                                onClick={(evt) => {
                                                                     evt.preventDefault();
                                                                     this.setState({
                                                                         paramToChangeBalance: {
@@ -198,14 +198,14 @@ export class AdministrationPage extends Component {
                                                                     });
                                                                 }}>-</Button>
                                                             <Button color="success" style={{ margin: 2 }}
-                                                                onClick={(evt, drink) => {
+                                                                onClick={(evt) => {
                                                                     evt.preventDefault();
                                                                     this.setState({
                                                                         paramToChangeBalance: {
                                                                             nameOperation: 'Увеличение',
                                                                             nameObject: drink.name,
                                                                             recordId: drink.id,
-                                                                            isDecrease: true,
+                                                                            isDecrease: false,
                                                                             methodName: 'changeDrinkBalance',
                                                                         },
                                                                         openFormForChangeBalance: true,
@@ -216,7 +216,7 @@ export class AdministrationPage extends Component {
                                                                     evt.preventDefault();
                                                                     this.setState({ createDrink: true, selectedDrink: drink.id });
                                                                 }}>Редактировать</Button>
-                                                        </Row>
+                                                        </div>
                                                     </td>
                                                 </tr>
                                             )}
@@ -251,6 +251,23 @@ export class AdministrationPage extends Component {
                             </Form>
                         </ModalBody>
                         <ModalFooter>
+                            <Button
+                                color="danger"
+                                onClick={(evt) => {
+                                    evt.preventDefault();
+                                    this.setState({
+                                        paramToChangeBalance: {
+                                            nameOperation: '',
+                                            nameObject: '',
+                                            recordId: 0,
+                                            isDecrease: null,
+                                            methodName: '',
+                                        },
+                                        openFormForChangeBalance: false,
+                                    });
+                                }}>
+                                Закрыть
+                            </Button>
                         </ModalFooter>
                     </Modal>
                 </div>
@@ -282,7 +299,7 @@ export class AdministrationPage extends Component {
 
     async changeFlagLocked(coinId, locked) {
         let query = 'administration/changeSignIsLockedForCoin?coinId=' + encodeURIComponent(coinId)
-                  + '&locked' + encodeURIComponent(locked);
+                  + '&locked=' + encodeURIComponent(locked);
 
         const response = await fetch(query, {
             method: 'GET',

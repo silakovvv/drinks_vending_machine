@@ -19,5 +19,7 @@ namespace DrinksVendingMachine.Data.Models
 
         [NotMapped]
         public int Balance { get; set; }
+        [NotMapped]
+        public string ImageInBase64 { get; set; }
     }
 }
