@@ -2,8 +2,8 @@ import React, { Component } from 'react';
 import { Route } from 'react-router';
 import { Layout } from './components/Layout';
 import { Home } from './components/Home';
-import { FetchData } from './components/FetchData';
-import { Counter } from './components/Counter';
+import { AdministrationPage } from './components/AdministrationPage';
+import { DrinkPage } from './components/DrinkPage';
 
 import './custom.css'
 
@@ -12,11 +12,11 @@ export default class App extends Component {
 
   render () {
     return (
-      <Layout>
-        <Route exact path='/' component={Home} />
-        <Route path='/counter' component={Counter} />
-        <Route path='/fetch-data' component={FetchData} />
-      </Layout>
+        <Layout>
+            <Route exact path='/' component={Home} />
+            <Route exact path='/admin-page' component={AdministrationPage} />
+            <Route exact path='/drink-page' component={DrinkPage} />
+        </Layout>
     );
   }
 }

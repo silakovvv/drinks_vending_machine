@@ -1,14 +1,60 @@
 /* Provide sufficient contrast against white background */
 a {
-  color: #0366d6;
+    color: #0366d6;
 }
 
 code {
-  color: #E01A76;
+    color: #E01A76;
 }
 
 .btn-primary {
-  color: #fff;
-  background-color: #1b6ec2;
-  border-color: #1861ac;
+    color: #fff;
+    background-color: #1b6ec2;
+    border-color: #1861ac;
+}
+
+.deposited-amount {
+    font-size: 1.8em;
+    margin-top: 14px;
+}
+
+.btn-coin {
+    background-color: #ffc107;
+    border-color: #d7a306;
+    border-radius: 50%;
+    color: white;
+    font-size: 1.5em;
+    margin-left: 15px;
+    height: 70px;
+    width: 70px;
+}
+
+.btn-coin:active,
+.btn-coin:hover,
+.btn-coin:focus {
+    background-color: #ffc20b !important;
+    border-color: #d7a306 !important;
+    color: white;
+    font-weight: bold;
+}
+
+.drink-cards .card {
+    margin: 1%;
+    padding: 0;
+    flex: 0 0 25%;
+    max-width: 23%;
+}
+
+.btn-confirmation-purchase {
+    font-size: 1.5em;
+    padding: 10px 15px;
+    margin: 5px;
+}
+
+.drink-cards .card-body {
+    padding: 5px;
+}
+
+.selected-card {
+    background-color: #a1ff97;
 }

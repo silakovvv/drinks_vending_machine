@@ -5,6 +5,9 @@ using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.EntityFrameworkCore;
+using DrinksVendingMachine.Data;
+using DrinksVendingMachine.Web.React.Data;
 
 namespace DrinksVendingMachine.Web.React
 {
@@ -20,6 +23,9 @@ namespace DrinksVendingMachine.Web.React
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddDbContext<VendingMachineContext>(options =>
+               options.UseSqlServer(
+                   Configuration.GetConnectionString("VendingMachineConnection")));
 
             services.AddControllersWithViews();
 
@@ -28,6 +34,9 @@ namespace DrinksVendingMachine.Web.React
             {
                 configuration.RootPath = "ClientApp/build";
             });
+
+            services.AddTransient<IVendingMachineRepository, VendingMachineRepository>();
+            services.AddTransient<IAdministrationRepository, AdministrationRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -63,7 +72,8 @@ namespace DrinksVendingMachine.Web.React
 
                 if (env.IsDevelopment())
                 {
-                    spa.UseReactDevelopmentServer(npmScript: "start");
+                    //spa.UseReactDevelopmentServer(npmScript: "start");
+                    spa.UseProxyToSpaDevelopmentServer("http://localhost:3000");
                 }
             });
         }
