@@ -94,7 +94,7 @@ namespace DrinksVendingMachine.Web.React.Data
 
             if (!String.IsNullOrEmpty(drink.ImageInBase64))
             {
-                drink.ImageInBase64 = drink.ImageInBase64.Replace("data:image/jpg;base64,", "");
+                drink.ImageInBase64 = drink.ImageInBase64.Replace("data:image/png;base64,", "");
                 drink.Image = System.Convert.FromBase64String(drink.ImageInBase64);
             }
 

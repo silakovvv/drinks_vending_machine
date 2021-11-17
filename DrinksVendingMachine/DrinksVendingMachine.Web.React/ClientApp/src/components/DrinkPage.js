@@ -100,11 +100,11 @@ export class DrinkPage extends Component {
                                     id="imageFile"
                                     name="imageFile"
                                     type="file"
-                                    accept=".jpg"
+                                    accept=".png"
                                     onChange={(evt) => { this.onImageChange(evt) }}
                                 />
                                 <FormText>
-                                    Необходимо выбрать файл с расширением JPG.
+                                    Необходимо выбрать файл с расширением PNG.
                                 </FormText>
                             </FormGroup>
                         </Col>
@@ -113,7 +113,7 @@ export class DrinkPage extends Component {
                                 && (<img
                                         alt="image of drink"
                                         id="imageOfDrink"
-                                        src={this.state.imageChanged ? this.state.image : 'data:image/jpg;base64,' + this.state.imageInBase64}
+                                        src={this.state.imageChanged ? this.state.image : 'data:image/png;base64,' + this.state.imageInBase64}
                                         width="100%"
                                 />)}
                         </Col>

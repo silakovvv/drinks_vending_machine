@@ -127,12 +127,16 @@ export class Home extends Component {
                                         evt.preventDefault(); this.chooseDrink(drink.id, drink.price, drink.balance);
                                     }}
                                 >
-                                    <CardImg
-                                        alt="image of drink"
-                                        src={(drink.imageInBase64 === null) ? "https://picsum.photos/318/180" : 'data:image/jpg;base64,' + drink.image}
-                                        top
-                                        width="100%"
-                                    />
+                                    <div className="container-fluid"
+                                        style={{ height: '11em' }}>
+                                        <CardImg
+                                            className="img-responive"
+                                            alt="image of drink"
+                                            src={(drink.image === null) ? "https://picsum.photos/318/180" : 'data:image/png;base64,' + drink.image}
+                                            top
+                                            width="100%"
+                                        />
+                                    </div>
                                     <CardBody className={this.state.selectedDrinks.includes(drink.id) ? "selected-card" : ""}>
                                         <CardTitle className="text-center" tag="h5">
                                             {drink.name}
