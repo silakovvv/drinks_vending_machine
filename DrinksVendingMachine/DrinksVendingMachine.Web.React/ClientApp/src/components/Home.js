@@ -62,7 +62,7 @@ export class Home extends Component {
         if (!(this.state.depositedAmount === 0)) {
             await this.getChangeInCoins();
         }
-        this.makePurchaseOperation();
+        await this.makePurchaseOperation();
         
         this.populateListOfDrinks();
         this.setState({
@@ -179,9 +179,9 @@ export class Home extends Component {
                                     {Object.keys(this.state.changeInCoins).map(item => {
                                         let listOfChangeInCoin = [];
                                         for (let i = 1; i <= this.state.changeInCoins[item]; i++) {
-                                            listOfChangeInCoin.push(<Button className="btn-coin">
+                                            listOfChangeInCoin.push(<div className="btn-coin">
                                                 {item}
-                                            </Button>);
+                                            </div>);
                                         }
                                         return listOfChangeInCoin;
                                     })}
