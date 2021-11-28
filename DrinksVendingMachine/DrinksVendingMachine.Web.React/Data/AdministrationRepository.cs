@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using DrinksVendingMachine.Data;
 using DrinksVendingMachine.Data.Models;
@@ -25,9 +26,23 @@ namespace DrinksVendingMachine.Web.React.Data
 
         public async Task<bool> AuthorizationCompletedAsync(string key)
         {
-            int authorizationKey = -910208893;
+            return CreateMD5Hash(key) == _configuration["AuthorizationKey"];
+        }
 
-            return key.GetHashCode() == authorizationKey;
+        private string CreateMD5Hash(string input)
+        {
+            using (System.Security.Cryptography.MD5 md5 = System.Security.Cryptography.MD5.Create())
+            {
+                byte[] inputBytes = System.Text.Encoding.ASCII.GetBytes(input);
+                byte[] hashBytes = md5.ComputeHash(inputBytes);
+
+                StringBuilder stringBuilder = new StringBuilder();
+                for (int i = 0; i < hashBytes.Length; i++)
+                {
+                    stringBuilder.Append(hashBytes[i].ToString("X2"));
+                }
+                return stringBuilder.ToString();
+            }
         }
 
         public async Task<List<Coin>> GetListOfCoinsWithBalanceAsync()

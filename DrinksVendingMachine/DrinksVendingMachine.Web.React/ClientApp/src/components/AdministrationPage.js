@@ -40,8 +40,8 @@ export class AdministrationPage extends Component {
 
     render() {
          if (this.state.createDrink) {
-            return (
-                <DrinkPage saveDrink={this.saveDrink} drinkId={this.state.selectedDrink} />
+             return (
+                 <DrinkPage saveDrink={this.saveDrink} drinkId={this.state.selectedDrink} authorizationCompleted={this.state.authorizationCompleted} />
             );
         }
 

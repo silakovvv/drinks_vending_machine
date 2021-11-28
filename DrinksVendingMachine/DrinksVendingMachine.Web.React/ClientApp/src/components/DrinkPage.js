@@ -7,6 +7,7 @@ export class DrinkPage extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            authorizationCompleted: this.props.authorizationCompleted,
             drinkId: this.props.drinkId,
             drinkName: "",
             description: "",
@@ -39,6 +40,16 @@ export class DrinkPage extends Component {
     }
 
     render() {
+        if (!(this.state.authorizationCompleted === true)) {
+            return (
+                <Col sm={12}>
+                    <Row style={{ fontSize: '1.3em' }}>
+                        Не выполнена авторизация.
+                    </Row>
+                </Col>
+            );
+        }
+
         return (
             <Col sm={12}>
                 <Row>
@@ -48,15 +59,14 @@ export class DrinkPage extends Component {
                     <Col sm={6}>
                         <div className="text-right">
                             <Button color="success"
-                                style={{
-                                    paddingTop: 10,
-                                    paddingRight: 20,
-                                    paddingBottom: 10,
-                                    paddingLeft: 20,
-                                    fontWeight: 700
-                                }}
+                                className="btn-drink-page"
                                 onClick={(evt) => { evt.preventDefault(); this.saveDrink(); }}>
                                 Сохранить
+                            </Button>
+                            <Button color="danger"
+                                className="btn-drink-page"
+                                onClick={(evt) => { evt.preventDefault(); this.props.saveDrink(); }}>
+                                Закрыть
                             </Button>
                         </div>
                     </Col>
