@@ -8,6 +8,7 @@ namespace DrinksVendingMachine.Web.React.Data
 {
     public interface IAdministrationRepository
     {
+        Task<bool> AuthorizationCompletedAsync(string key);
         Task<List<Coin>> GetListOfCoinsWithBalanceAsync();
         Task<bool> ChangeCoinBalanceAsync(CoinTransaction coinTransaction);
         Task<bool> ChangeSignIsLockedForCoinAsync(int coinId, bool locked);

@@ -44,7 +44,7 @@ namespace DrinksVendingMachine.Web.React.Data
             return listOfDrinks;
         }
 
-        public async Task<Dictionary<string, int>> GetChangeInCoinsAsync(int change)
+        public async Task<Dictionary<string, int>> GetChangeInCoinsAsync(int change, Coin[] depositedCoins)
         {
             if (change == 0)
             {
@@ -66,8 +66,7 @@ namespace DrinksVendingMachine.Web.React.Data
                     continue;
                 }
 
-                decimal[] arrayOfValue = { change / listOfCoins[i].Cost, listOfCoins[i].Balance };
-                int amountOfCurrentCoin = (int)arrayOfValue.Min();
+                var amountOfCurrentCoin = GetAmountOfCurrentCoin(listOfCoins[i], depositedCoins, change);
 
                 change -= amountOfCurrentCoin * (int)listOfCoins[i].Cost;
 
@@ -75,6 +74,47 @@ namespace DrinksVendingMachine.Web.React.Data
             }
 
             return dictionaryAmountOfCoins;
+        }
+
+        public async Task<bool> NotEnoughCoinsForChange(int change, Coin[] depositedCoins)
+        {
+            if (change == 0)
+            {
+                return false;
+            }
+
+            var listOfCoins = await GetListOfCoinsWithBalanceAsync();
+
+            for (int i = 0; i < listOfCoins.Count; i++)
+            {
+                if (change == 0)
+                {
+                    break;
+                }
+                else if (change / (int)listOfCoins[i].Cost == 0)
+                {
+                    continue;
+                }
+
+                var amountOfCurrentCoin = GetAmountOfCurrentCoin(listOfCoins[i], depositedCoins, change);
+
+                change -= amountOfCurrentCoin * (int)listOfCoins[i].Cost;
+            }
+
+            return change > 0;
+        }
+
+        private int GetAmountOfCurrentCoin(Coin coin, Coin[] depositedCoins, int change)
+        {
+            var foundCoin = depositedCoins.Where(c => c.Id == coin.Id).FirstOrDefault();
+            if (foundCoin != null)
+            {
+                coin.Balance += foundCoin.Balance;
+            }
+
+            decimal[] arrayOfValue = { change / coin.Cost, coin.Balance };
+            
+            return (int)arrayOfValue.Min();
         }
 
         public async Task<List<Coin>> GetListOfCoinsWithBalanceAsync()

@@ -10,16 +10,15 @@ export class AdministrationPage extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            authorizationCompleted: null,
             listOfCoins: [],
             listOfDrinks: [],
             openFormForChangeBalance: false,
             activeTab: '1',
             paramToChangeBalance: {
-                nameOperation: '',
+                methodName: '',
                 nameObject: '',
                 recordId: 0,
-                isDecrease: null,
-                methodName: '',
             },
             createDrink: false,
             selectedDrink: 0
@@ -27,8 +26,7 @@ export class AdministrationPage extends Component {
     }
 
     componentDidMount() {
-        this.populateListOfCoins();
-        this.populateListOfDrinks();
+        this.checkauthorization();
     }
 
     toggleTabPane = tab => {
@@ -41,238 +39,271 @@ export class AdministrationPage extends Component {
     }
 
     render() {
-        if (this.state.createDrink) {
+         if (this.state.createDrink) {
             return (
                 <DrinkPage saveDrink={this.saveDrink} drinkId={this.state.selectedDrink} />
             );
         }
 
-        return (
-            <Col sm={12}>
-                <div>
-                    <Nav tabs>
-                        <NavItem>
-                            <NavLink
-                                className={classnames({ active: this.state.activeTab === '1' })}
-                                onClick={() => { this.toggleTabPane('1'); }}>
-                                Монеты
-                            </NavLink>
-                        </NavItem>
-                        <NavItem>
-                            <NavLink
-                                className={classnames({ active: this.state.activeTab === '2' })}
-                                onClick={() => { this.toggleTabPane('2'); }}>
-                                Напитки
-                            </NavLink>
-                        </NavItem>
-                    </Nav>
-                    <TabContent activeTab={this.state.activeTab}>
-                        <TabPane tabId="1">
-                            <FormGroup>
-                                <Row>
-                                    <Table className='table table-striped' aria-labelledby="tabelLabel">
-                                        <thead>
-                                            <tr>
-                                                <th className="text-center">#</th>
-                                                <th className="text-center">Название</th>
-                                                <th className="text-center">Короткое название</th>
-                                                <th className="text-center">Номинал</th>
-                                                <th className="text-center">Заблокирована</th>
-                                                <th className="text-center">Баланс</th>
-                                                <th></th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {this.state.listOfCoins.map(coin =>
-                                                <tr key={coin.id}>
-                                                    <th scope="row">{coin.id}</th>
-                                                    <td>{coin.name}</td>
-                                                    <td className="text-center">{coin.schortName}</td>
-                                                    <td className="text-center">{coin.cost}</td>
-                                                    <td className="text-center">
-                                                        <Input
-                                                            className="form-check-input"
-                                                            type="checkbox"
-                                                            id="isLockedCoin"
-                                                            checked={coin.locked ? true : false}
-                                                            onChange={(evt) => { this.changeFlagLocked(coin.id, !coin.locked) }}
-                                                        />
-                                                    </td>
-                                                    <td className="text-center">{coin.balance}</td>
-                                                    <td>
-                                                        <Row>
-                                                            <Button color="danger" style={{ margin: 2 }}
-                                                                onClick={(evt) => {
-                                                                    evt.preventDefault();
-                                                                    this.setState({
-                                                                        paramToChangeBalance: {
-                                                                            nameOperation: 'Уменьшение',
-                                                                            nameObject: coin.name,
-                                                                            recordId: coin.id,
-                                                                            isDecrease: true,
-                                                                            methodName: 'changeCoinBalance',
-                                                                        },
-                                                                        openFormForChangeBalance: true,
-                                                                    });
-                                                                }}>-</Button>
-                                                            <Button color="success" style={{ margin: 2 }}
-                                                                onClick={(evt) => {
-                                                                    evt.preventDefault();
-                                                                    this.setState({
-                                                                        paramToChangeBalance: {
-                                                                            nameOperation: 'Увеличение',
-                                                                            nameObject: coin.name,
-                                                                            recordId: coin.id,
-                                                                            isDecrease: false,
-                                                                            methodName: 'changeCoinBalance',
-                                                                        },
-                                                                        openFormForChangeBalance: true,
-                                                                    });
-                                                                }}>+</Button>
-                                                        </Row>
-                                                    </td>
-                                                </tr>
-                                            )}
-                                        </tbody>
-                                    </Table>
-                                </Row>
-                            </FormGroup>
-                        </TabPane>
-                        <TabPane tabId="2">
-                            <FormGroup>
-                                {false && (<Row>
-                                    <Col sm={12}>
-                                        <div className="text-right">
-                                            <Button
-                                                color="success" style={{ padding: 10 }}
-                                                onClick={(evt) => {
-                                                    evt.preventDefault();
-                                                    this.setState({ createDrink: true, selectedDrink: 0 });
-                                                }}>Добавить напиток</Button>
-                                        </div>
-                                    </Col>
-                                </Row>)}
-                                <Row>
-                                    <Table className='table table-striped' aria-labelledby="tabelLabel">
-                                        <thead>
-                                            <tr>
-                                                <th className="text-center">#</th>
-                                                <th className="text-center">Название</th>
-                                                <th className="text-center">Описание</th>
-                                                <th className="text-center">Цена</th>
-                                                <th className="text-center">Остаток</th>
-                                                <th className="text-right">
-                                                    <Button
-                                                        color="success" style={{ paddingLeft: 5, paddingRight: 5 }}
-                                                        onClick={(evt) => {
-                                                            evt.preventDefault();
-                                                            this.setState({ createDrink: true, selectedDrink: 0 });
-                                                        }}>
-                                                        Добавить напиток
-                                                    </Button>
-                                                </th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {this.state.listOfDrinks.map(drink =>
-                                                <tr key={drink.id}>
-                                                    <th scope="row">{drink.id}</th>
-                                                    <td>{drink.name}</td>
-                                                    <td>{drink.description}</td>
-                                                    <td className="text-center">{drink.price}</td>
-                                                    <td className="text-center">{drink.balance}</td>
-                                                    <td className="text-right">
-                                                        <div>
-                                                            <Button color="danger" style={{ margin: 2 }}
-                                                                onClick={(evt) => {
-                                                                    evt.preventDefault();
-                                                                    this.setState({
-                                                                        paramToChangeBalance: {
-                                                                            nameOperation: 'Уменьшение',
-                                                                            nameObject: drink.name,
-                                                                            recordId: drink.id,
-                                                                            isDecrease: true,
-                                                                            methodName: 'changeDrinkBalance',
-                                                                        },
-                                                                        openFormForChangeBalance: true,
-                                                                    });
-                                                                }}>-</Button>
-                                                            <Button color="success" style={{ margin: 2 }}
-                                                                onClick={(evt) => {
-                                                                    evt.preventDefault();
-                                                                    this.setState({
-                                                                        paramToChangeBalance: {
-                                                                            nameOperation: 'Увеличение',
-                                                                            nameObject: drink.name,
-                                                                            recordId: drink.id,
-                                                                            isDecrease: false,
-                                                                            methodName: 'changeDrinkBalance',
-                                                                        },
-                                                                        openFormForChangeBalance: true,
-                                                                    });
-                                                                }}>+</Button>
-                                                            <Button color="primary" style={{ margin: 2 }}
-                                                                onClick={(evt) => {
-                                                                    evt.preventDefault();
-                                                                    this.setState({ createDrink: true, selectedDrink: drink.id });
-                                                                }}>Редактировать</Button>
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                            )}
-                                        </tbody>
-                                    </Table>
-                                </Row>
-                            </FormGroup>
-                        </TabPane>
-                    </TabContent>
-                </div>
-                <div>
-                    <Modal isOpen={this.state.openFormForChangeBalance}>
-                        <ModalHeader>{this.state.paramToChangeBalance.nameOperation} баланс записи: {this.state.paramToChangeBalance.nameObject}.</ModalHeader>
-                        <ModalBody>
-                            <Form>
+        if (this.state.authorizationCompleted === null) {
+            return (
+                <Col sm={12}>
+                    <Row>
+                        Загрузка...
+                    </Row>
+                </Col>
+            );
+        }
+        else if(this.state.authorizationCompleted === false) {
+            return (
+                <Col sm={12}>
+                    <Row style={{ fontSize: '1.3em' }}>
+                        Не удалось получить доступ к странице администрирования. Указан неверный ключ.
+                    </Row>
+                </Col>
+            );
+        }
+        else {
+            return (
+                <Col sm={12}>
+                    <div>
+                        <Nav tabs>
+                            <NavItem>
+                                <NavLink
+                                    className={classnames({ active: this.state.activeTab === '1' })}
+                                    onClick={() => { this.toggleTabPane('1'); }}>
+                                    Монеты
+                                </NavLink>
+                            </NavItem>
+                            <NavItem>
+                                <NavLink
+                                    className={classnames({ active: this.state.activeTab === '2' })}
+                                    onClick={() => { this.toggleTabPane('2'); }}>
+                                    Напитки
+                                </NavLink>
+                            </NavItem>
+                        </Nav>
+                        <TabContent activeTab={this.state.activeTab}>
+                            <TabPane tabId="1">
                                 <FormGroup>
-                                    <InputGroup>
-                                        <Input
-                                            name="amountToChangeBalance"
-                                            id="amountToChangeBalance"
-                                            placeholder="Укажите количество..."
-                                        />
-                                        <InputGroupAddon addonType="append">
-                                            <Button
-                                                color="primary"
-                                                onClick={(evt) => { evt.preventDefault(); this.changeBalance(document.getElementById("amountToChangeBalance").value); }}>
-                                                {this.state.paramToChangeBalance.nameOperation}
-                                            </Button>
-                                        </InputGroupAddon>
-                                    </InputGroup>
+                                    <Row>
+                                        <Col sm={12}>
+                                            <Table className='table table-striped' aria-labelledby="tabelLabel">
+                                                <thead>
+                                                    <tr>
+                                                        <th className="text-center">#</th>
+                                                        <th className="text-center">Название</th>
+                                                        <th className="text-center">Короткое название</th>
+                                                        <th className="text-center">Номинал</th>
+                                                        <th className="text-center">Заблокирована</th>
+                                                        <th className="text-center">Баланс</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {this.state.listOfCoins.map(coin =>
+                                                        <tr key={coin.id}>
+                                                            <th scope="row">{coin.id}</th>
+                                                            <td>{coin.name}</td>
+                                                            <td className="text-center">{coin.schortName}</td>
+                                                            <td className="text-center">{coin.cost}</td>
+                                                            <td className="text-center">
+                                                                <Input
+                                                                    className="form-check-input"
+                                                                    type="checkbox"
+                                                                    id="isLockedCoin"
+                                                                    checked={coin.locked ? true : false}
+                                                                    onChange={(evt) => { this.changeFlagLocked(coin.id, !coin.locked) }}
+                                                                />
+                                                            </td>
+                                                            <td>
+                                                                <Col sm={12}>
+                                                                    <Row>
+                                                                        <Col sm={4} className="text-center">{coin.balance}</Col>
+                                                                        <Col sm={8}>
+                                                                            <Button color="primary"
+                                                                                onClick={(evt) => {
+                                                                                    evt.preventDefault();
+                                                                                    this.setState({
+                                                                                        paramToChangeBalance: {
+                                                                                            methodName: 'changeCoinBalance',
+                                                                                            nameObject: coin.name,
+                                                                                            recordId: coin.id,
+                                                                                        },
+                                                                                        openFormForChangeBalance: true,
+                                                                                    });
+                                                                                    console.log({ 'key': this.props.match.params['key'] });
+                                                                                }}>Изменить</Button>
+                                                                        </Col>
+                                                                    </Row>
+                                                                </Col>
+                                                            </td>
+                                                        </tr>
+                                                    )}
+                                                </tbody>
+                                            </Table>
+                                        </Col>
+                                    </Row>
                                 </FormGroup>
-                            </Form>
-                        </ModalBody>
-                        <ModalFooter>
-                            <Button
-                                color="danger"
-                                onClick={(evt) => {
-                                    evt.preventDefault();
-                                    this.setState({
-                                        paramToChangeBalance: {
-                                            nameOperation: '',
-                                            nameObject: '',
-                                            recordId: 0,
-                                            isDecrease: null,
-                                            methodName: '',
-                                        },
-                                        openFormForChangeBalance: false,
-                                    });
-                                }}>
-                                Закрыть
-                            </Button>
-                        </ModalFooter>
-                    </Modal>
-                </div>
-            </Col>
-        );
+                            </TabPane>
+                            <TabPane tabId="2">
+                                <FormGroup>
+                                    {false && (<Row>
+                                        <Col sm={12}>
+                                            <div className="text-right">
+                                                <Button
+                                                    color="success" style={{ padding: 10 }}
+                                                    onClick={(evt) => {
+                                                        evt.preventDefault();
+                                                        this.setState({ createDrink: true, selectedDrink: 0 });
+                                                    }}>Добавить напиток</Button>
+                                            </div>
+                                        </Col>
+                                    </Row>)}
+                                    <Row>
+                                        <Col sm={12}>
+                                            <Table className='table table-striped' aria-labelledby="tabelLabel">
+                                                <thead>
+                                                    <tr>
+                                                        <th className="text-center">#</th>
+                                                        <th className="text-center">Название</th>
+                                                        <th className="text-center">Описание</th>
+                                                        <th className="text-center">Цена</th>
+                                                        <th className="text-center">Остаток</th>
+                                                        <th className="text-right">
+                                                            <Button
+                                                                color="success" style={{ paddingLeft: 5, paddingRight: 5 }}
+                                                                onClick={(evt) => {
+                                                                    evt.preventDefault();
+                                                                    this.setState({ createDrink: true, selectedDrink: 0 });
+                                                                }}>
+                                                                Добавить напиток
+                                                            </Button>
+                                                        </th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {this.state.listOfDrinks.map(drink =>
+                                                        <tr key={drink.id}>
+                                                            <th scope="row">{drink.id}</th>
+                                                            <td>{drink.name}</td>
+                                                            <td>{drink.description}</td>
+                                                            <td className="text-center">{drink.price}</td>
+                                                            <td className="text-center">
+                                                                <Col sm={12}>
+                                                                    <Row>
+                                                                        <Col sm={4}>
+                                                                            {drink.balance}
+                                                                        </Col>
+                                                                        <Col sm={8}>
+                                                                            <Button color="primary" style={{ margin: 2 }}
+                                                                                onClick={(evt) => {
+                                                                                    evt.preventDefault();
+                                                                                    this.setState({
+                                                                                        paramToChangeBalance: {
+                                                                                            methodName: 'changeDrinkBalance',
+                                                                                            nameObject: drink.name,
+                                                                                            recordId: drink.id,
+                                                                                        },
+                                                                                        openFormForChangeBalance: true,
+                                                                                    });
+                                                                                }}>Изменить</Button>
+                                                                        </Col>
+                                                                    </Row>
+                                                                </Col>
+                                                            </td>
+                                                            <td className="text-right" style={{ margin: 2 }}>
+                                                                <div>
+                                                                    <Button color="primary" style={{ margin: 2 }}
+                                                                        onClick={(evt) => {
+                                                                            evt.preventDefault();
+                                                                            this.setState({ createDrink: true, selectedDrink: drink.id });
+                                                                        }}>Редактировать</Button>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    )}
+                                                </tbody>
+                                            </Table>
+                                        </Col>
+                                    </Row>
+                                </FormGroup>
+                            </TabPane>
+                        </TabContent>
+                    </div>
+                    <div>
+                        <Modal isOpen={this.state.openFormForChangeBalance}>
+                            <ModalHeader>Изменить баланс записи: {this.state.paramToChangeBalance.nameObject}.</ModalHeader>
+                            <ModalBody>
+                                <Form>
+                                    <FormGroup>
+                                        <InputGroup>
+                                            <Input style={{ margin: 2 }}
+                                                name="amountToChangeBalance"
+                                                id="amountToChangeBalance"
+                                                placeholder="Укажите количество..."
+                                                autocomplete="off"
+                                            />
+                                            <InputGroupAddon addonType="append">
+                                                <Button color="danger" style={{ margin: 2 }}
+                                                    onClick={(evt) => {
+                                                        evt.preventDefault();
+                                                        this.handlerBalanceChange(document.getElementById("amountToChangeBalance").value, true);
+                                                    }}>уменьшить</Button>
+                                                <Button color="success" style={{ margin: 2 }}
+                                                    onClick={(evt) => {
+                                                        evt.preventDefault();
+                                                        this.handlerBalanceChange(document.getElementById("amountToChangeBalance").value, false);
+                                                    }}>увеличить</Button>
+                                            </InputGroupAddon>
+                                        </InputGroup>
+                                    </FormGroup>
+                                </Form>
+                            </ModalBody>
+                            <ModalFooter>
+                                <Button
+                                    color="primary"
+                                    onClick={(evt) => {
+                                        evt.preventDefault();
+                                        this.setState({
+                                            paramToChangeBalance: {
+                                                methodName: '',
+                                                nameObject: '',
+                                                recordId: 0,
+                                            },
+                                            openFormForChangeBalance: false,
+                                        });
+                                    }}>
+                                    Закрыть
+                                </Button>
+                            </ModalFooter>
+                        </Modal>
+                    </div>
+                </Col>
+            );
+        }
+    }
+
+    async checkauthorization() {
+        const response = await fetch('administration/authorizationCompleted', {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(this.props.match.params['key'])
+        });
+        const result = await response.json();
+
+        this.setState({
+            authorizationCompleted: result
+        });
+
+        if (result === true) {
+            this.populateListOfCoins();
+            this.populateListOfDrinks();
+        }
+
+        console.log({ 'authorizationCompleted': result });
     }
 
     async populateListOfCoins() {
@@ -313,11 +344,33 @@ export class AdministrationPage extends Component {
         this.populateListOfCoins();
     }
 
-    async changeBalance(amount) {
+    async handlerBalanceChange(amount, isDecrease) {
+        await this.changeBalance(amount, isDecrease);
+
+        if (this.state.paramToChangeBalance.methodName === 'changeCoinBalance') {
+            console.log('update listOfCoins');
+            this.populateListOfCoins();
+        }
+        else {
+            console.log('update listOfDrinks');
+            this.populateListOfDrinks();
+        }
+ 
+        this.setState({
+            paramToChangeBalance: {
+                methodName: '',
+                nameObject: '',
+                recordId: 0,
+            },
+            openFormForChangeBalance: false,
+        });
+   }
+
+    async changeBalance(amount, isDecrease) {
         let query = 'administration/' + this.state.paramToChangeBalance.methodName;
 
         let recordId = this.state.paramToChangeBalance.recordId;
-        let coefficientAmount = (this.state.paramToChangeBalance.isDecrease ? -1 : 1);
+        let coefficientAmount = (isDecrease ? -1 : 1);
 
         let requestBody = this.state.paramToChangeBalance.methodName === 'changeCoinBalance'
             ? {
@@ -342,22 +395,6 @@ export class AdministrationPage extends Component {
         });
         const result = await response.json();
 
-        this.setState({
-            paramToChangeBalance: {
-                nameOperation: '',
-                nameObject: '',
-                recordId: 0,
-                isDecrease: null,
-                methodName: '',
-            },
-            openFormForChangeBalance: false,
-        });
-
-        if (this.state.paramToChangeBalance.methodName === 'changeCoinBalance') {
-            this.populateListOfCoins();
-        }
-        else {
-            this.populateListOfDrinks();
-        }
+        console.log({ 'changeBalance': result });
     }
 }

@@ -29,6 +29,13 @@ code {
     width: 70px;
 }
 
+div.btn-coin-change {
+    border: 1px solid #d7a306;
+    text-align: center;
+    padding-top: 15px;
+}
+
+
 .btn-coin:active,
 .btn-coin:hover,
 .btn-coin:focus {
@@ -46,9 +53,10 @@ code {
 }
 
 .btn-confirmation-purchase {
-    font-size: 1.5em;
+    font-size: 1.3em;
     padding: 10px 15px;
     margin: 5px;
+    width: 100%;
 }
 
 .drink-cards .card-body {
@@ -57,4 +65,15 @@ code {
 
 .selected-card {
     background-color: #a1ff97;
+}
+
+.info-about-change {
+    font-size: 1.3em;
+    color: red;
+}
+
+.btn-return-coin {
+    font-size: 1.3em;
+    margin: 5px;
+    width: 100%;
 }

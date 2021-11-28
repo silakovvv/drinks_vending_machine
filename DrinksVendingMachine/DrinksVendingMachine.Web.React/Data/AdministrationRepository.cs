@@ -23,6 +23,13 @@ namespace DrinksVendingMachine.Web.React.Data
             return new VendingMachineContext(_configuration.GetConnectionString("VendingMachineConnection"));
         }
 
+        public async Task<bool> AuthorizationCompletedAsync(string key)
+        {
+            int authorizationKey = -910208893;
+
+            return key.GetHashCode() == authorizationKey;
+        }
+
         public async Task<List<Coin>> GetListOfCoinsWithBalanceAsync()
         {
             await using var context = CreateContext();

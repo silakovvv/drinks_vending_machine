@@ -10,7 +10,8 @@ namespace DrinksVendingMachine.Web.React.Data
     {
         Task<IEnumerable<Coin>> GetListOfCoinsAsync();
         Task<List<Drink>> GetListOfDrinksWithBalanceAsync();
-        Task<Dictionary<string, int>> GetChangeInCoinsAsync(int depositedAmount);
+        Task<bool> NotEnoughCoinsForChange(int change, Coin[] depositedCoins);
+        Task<Dictionary<string, int>> GetChangeInCoinsAsync(int depositedAmount, Coin[] depositedCoins);
         Task<bool> MakePurchaseOperationAsync(CoinTransaction[] coinTransactions, VendingMachineOperation[] vendingMachineOperations);
     }
 }

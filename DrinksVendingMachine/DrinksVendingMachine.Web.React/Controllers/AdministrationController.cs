@@ -27,6 +27,13 @@ namespace DrinksVendingMachine.Web.React.Controllers
 
         [HttpPost]
         [Route("[action]")]
+        public async Task<bool> AuthorizationCompletedAsync([FromBody] string key)
+        {
+            return await _administrationRepository.AuthorizationCompletedAsync(key);
+        }
+
+        [HttpPost]
+        [Route("[action]")]
         public async Task<List<Coin>> ListOfCoinsWithBalanceAsync()
         {
             return await _administrationRepository.GetListOfCoinsWithBalanceAsync();

@@ -12,9 +12,10 @@ export class Home extends Component {
             listOfDrinks: [],
             depositedAmount: 0,
             depositedCoin: {},
-            changeInCoins: [],
+            changeInCoins: {},
             selectedDrinks: [],
             openFormErrorNotEnoughFunds: false,
+            notEnoughCoinsForChange: false,
         };
     }
 
@@ -39,6 +40,8 @@ export class Home extends Component {
             this.setState({
                 depositedAmount: this.state.depositedAmount + price,
                 selectedDrinks: this.state.selectedDrinks.filter(item => item !== drinkId)
+            }, () => {
+                this.checkCoinsForChange(this.state.depositedAmount);
             });
             return;
         }
@@ -48,10 +51,29 @@ export class Home extends Component {
             return;
         }
 
-        this.setState({ depositedAmount: this.state.depositedAmount - price });
+        this.setState({
+            depositedAmount: this.state.depositedAmount - price
+        }, () => {
+            this.checkCoinsForChange(this.state.depositedAmount);
+        });
 
         this.state.selectedDrinks.push(drinkId);
         this.setState({ selectedDrinks: this.state.selectedDrinks });
+    }
+
+    returnCoinsFromMachine() {
+        let changeInCoins = {};
+        Object.keys(this.state.depositedCoin).map(item => 
+            changeInCoins[this.state.listOfCoins.filter(coin => coin.id === parseInt(item))[0].schortName] = this.state.depositedCoin[item]
+        );
+
+        this.setState({
+            changeInCoins: changeInCoins,
+            depositedCoin: {},
+            depositedAmount: 0,
+            selectedDrinks: [],
+            notEnoughCoinsForChange: false,
+        });
     }
 
     async confirmPurchase() {
@@ -105,6 +127,26 @@ export class Home extends Component {
                     </Col>
                 </Row>
                 <Row>
+                    <Col sm={12}>
+                        {this.state.notEnoughCoinsForChange && (
+                            <Row>
+                                <Col sm={9}>
+                                    <div className="info-about-change">
+                                        Не хватает монет для сдачи!
+                                    </div>
+                                </Col>
+                                <Col sm={3}>
+                                    <Button color="primary" className="btn-return-coin"
+                                        onClick={(evt) => {
+                                        evt.preventDefault();
+                                        this.returnCoinsFromMachine();
+                                    }}>Вернуть монеты</Button>
+                                </Col>
+                            </Row>
+                        )}
+                    </Col>
+                </Row>
+                <Row>
                     <Modal isOpen={this.state.openFormErrorNotEnoughFunds}>
                         <ModalHeader>Не удалось выбрать напиток.</ModalHeader>
                         <ModalBody>
@@ -124,7 +166,8 @@ export class Home extends Component {
                             {this.state.listOfDrinks.map(drink =>
                                 <Card
                                     onClick={(evt) => {
-                                        evt.preventDefault(); this.chooseDrink(drink.id, drink.price, drink.balance);
+                                        evt.preventDefault();
+                                        this.chooseDrink(drink.id, drink.price, drink.balance);
                                     }}
                                 >
                                     <div className="container-fluid"
@@ -179,7 +222,7 @@ export class Home extends Component {
                                     {Object.keys(this.state.changeInCoins).map(item => {
                                         let listOfChangeInCoin = [];
                                         for (let i = 1; i <= this.state.changeInCoins[item]; i++) {
-                                            listOfChangeInCoin.push(<div className="btn-coin">
+                                            listOfChangeInCoin.push(<div className="btn-coin btn-coin-change">
                                                 {item}
                                             </div>);
                                         }
@@ -230,6 +273,7 @@ export class Home extends Component {
                 'coinId': this.state.listOfCoins.filter(coin => coin.schortName === item)[0].id,
                 'amount': parseInt(this.state.changeInCoins[item]) * (-1),
             }));
+        console.log({ arrayOfCoinTransactions });
         
         var arrayOfVendingMachineOperations = [];
         this.state.selectedDrinks.map(drink => arrayOfVendingMachineOperations.push(
@@ -255,15 +299,36 @@ export class Home extends Component {
         console.log(result);
     }
 
-    async getChangeInCoins() {
-        let query = 'vendingMachine/change?change=' + encodeURIComponent(this.state.depositedAmount);
-
-        const response = await fetch(query, {
-            method: 'GET',
+    async checkCoinsForChange(currentChange) {
+        const response = await fetch('vendingMachine/notEnoughCoinsForChange', {
+            method: 'POST',
             headers: {
-                'Accept': 'application/json',
+                'Accept': 'app//lication/json',
                 'Content-Type': 'application/json'
-            }
+            },
+            body: JSON.stringify({
+                'change': currentChange,
+                'depositedCoins': this.getArrayOfDepositedCoins(),
+            })
+        });
+        const data = await response.json();
+
+        this.setState({
+            notEnoughCoinsForChange: data
+        });
+    }
+
+    async getChangeInCoins() {
+        const response = await fetch('vendingMachine/getChangeInCoins', {
+            method: 'POST',
+            headers: {
+                'Accept': 'app//lication/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                'change': this.state.depositedAmount,
+                'depositedCoins': this.getArrayOfDepositedCoins(),
+            })
         });
         const data = await response.json();
 
@@ -271,5 +336,16 @@ export class Home extends Component {
             changeInCoins: data,
             depositedAmount: 0,
         });
+    }
+
+    getArrayOfDepositedCoins() {
+        var arrayOfDepositedCoins = [];
+        Object.keys(this.state.depositedCoin).map(item => arrayOfDepositedCoins.push(
+            {
+                'id': parseInt(item),
+                'balance': parseInt(this.state.depositedCoin[item]),
+            }));
+
+        return arrayOfDepositedCoins;
     }
 }
