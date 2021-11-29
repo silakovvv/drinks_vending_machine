@@ -89,7 +89,8 @@ export class Home extends Component {
         this.populateListOfDrinks();
         this.setState({
             selectedDrinks: [],
-        })
+            depositedCoin: {},
+        });
     }
 
     render () {
@@ -132,7 +133,7 @@ export class Home extends Component {
                             <Row>
                                 <Col sm={9}>
                                     <div className="info-about-change">
-                                        Не хватает монет для сдачи!
+                                        Не хватает монет для сдачи! При подтверждении покупки сдача будет не выдана или выдана не полностью.
                                     </div>
                                 </Col>
                                 <Col sm={3}>
@@ -170,8 +171,7 @@ export class Home extends Component {
                                         this.chooseDrink(drink.id, drink.price, drink.balance);
                                     }}
                                 >
-                                    <div className="container-fluid"
-                                        style={{ height: '11em' }}>
+                                    <div style={{ display: 'none' }}>
                                         <CardImg
                                             className="img-responive"
                                             alt="image of drink"
@@ -180,6 +180,15 @@ export class Home extends Component {
                                             width="100%"
                                         />
                                     </div>
+                                    <div className="drink-img"
+                                        style={{
+                                            backgroundImage: 'url(data:image/' + drink.imageExpansion + ';base64,' + drink.image + ')',
+                                            backgroundPosition: 'center',
+                                            backgroundSize: 'cover',
+                                            backgroundRepeat: 'no-repeat'
+                                        }}>
+                                    </div>
+
                                     <CardBody className={this.state.selectedDrinks.includes(drink.id) ? "selected-card" : ""}>
                                         <CardTitle className="text-center" tag="h5">
                                             {drink.name}
@@ -203,7 +212,7 @@ export class Home extends Component {
                 <Row>
                     <Col sm={12}>
                         <Row>
-                            <Col sm={4}>
+                            <Col sm={3}>
                                 {!(Object.keys(this.state.changeInCoins).length === 0) && (
                                     <Button
                                         className="btn-confirmation-purchase"
@@ -211,13 +220,14 @@ export class Home extends Component {
                                         onClick={(evt) => {
                                             evt.preventDefault();
                                             this.setState({
-                                                changeInCoins: []
+                                                changeInCoins: [],
+                                                depositedCoin: {},
                                             })
                                         }}>
                                         Забрать сдачу
                                     </Button>)}
                             </Col>
-                            <Col sm={8}>
+                            <Col sm={9}>
                                 <Row>
                                     {Object.keys(this.state.changeInCoins).map(item => {
                                         let listOfChangeInCoin = [];
@@ -273,7 +283,6 @@ export class Home extends Component {
                 'coinId': this.state.listOfCoins.filter(coin => coin.schortName === item)[0].id,
                 'amount': parseInt(this.state.changeInCoins[item]) * (-1),
             }));
-        console.log({ arrayOfCoinTransactions });
         
         var arrayOfVendingMachineOperations = [];
         this.state.selectedDrinks.map(drink => arrayOfVendingMachineOperations.push(

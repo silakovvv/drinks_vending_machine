@@ -114,7 +114,7 @@ namespace DrinksVendingMachine.Web.React.Data
         {
             await using var context = CreateContext();
 
-            if (!String.IsNullOrEmpty(drink.ImageInBase64))
+            if (ImageOfAllowedFormat(drink.ImageExpansion) && !String.IsNullOrEmpty(drink.ImageInBase64))
             {
                 drink.ImageInBase64 = drink.ImageInBase64.Replace("data:image/png;base64,", "");
                 drink.Image = System.Convert.FromBase64String(drink.ImageInBase64);
@@ -130,13 +130,24 @@ namespace DrinksVendingMachine.Web.React.Data
 
                 liveDrink.Name = drink.Name;
                 liveDrink.Description = drink.Description;
-                liveDrink.Image = drink.Image;
                 liveDrink.Price = drink.Price;
+                
+                if (ImageOfAllowedFormat(drink.ImageExpansion))
+                {
+                    liveDrink.Image = drink.Image;
+                    liveDrink.ImageExpansion = drink.ImageExpansion;
+                }
             }
 
             context.SaveChanges();
 
             return true;
+        }
+
+        private bool ImageOfAllowedFormat(string imageExpansion)
+        {
+            return !String.IsNullOrEmpty(imageExpansion)
+                    && _configuration["ImageExtensionFilter"].IndexOf(imageExpansion) >= 0;
         }
     }
 }

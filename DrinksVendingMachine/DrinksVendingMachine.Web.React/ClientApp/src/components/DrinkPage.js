@@ -3,6 +3,8 @@ import {
     Button, Form, FormGroup, Label, Input, Row, Col, FormText, Card, CardImg
 } from 'reactstrap';
 
+const imageExtensionFilter = ".jpg,.jpeg,.png";
+
 export class DrinkPage extends Component {
     constructor(props) {
         super(props);
@@ -10,11 +12,16 @@ export class DrinkPage extends Component {
             authorizationCompleted: this.props.authorizationCompleted,
             drinkId: this.props.drinkId,
             drinkName: "",
+            drinkNameErr: false,
             description: "",
             price: 0,
+            priceErr: false,
             image: null,
+            imageSelectionHint: "Выберите файл напитка.",
+            imageExpansion: "",
             imageInBase64: '',
             imageChanged: false,
+            imageLoadingError: false,
             savedDrink: false,
         };
     }
@@ -31,10 +38,27 @@ export class DrinkPage extends Component {
     onImageChange(evt) {
         if (evt.target.files && evt.target.files[0]) {
             const fileImage = evt.target.files[0];
+            const expansion = fileImage.name.split('.').pop();
+
+            if (imageExtensionFilter.indexOf(expansion) < 0) {
+                evt.target.value = "";
+
+                this.setState({
+                    image: null,
+                    imageChanged: true,
+                    imageExpansion: "",
+                    imageSelectionHint: "Выбран файл с неверным расширением.",
+                    imageLoadingError: true,
+                });
+                return;
+            }
 
             this.setState({
                 image: URL.createObjectURL(fileImage),
                 imageChanged: true,
+                imageExpansion: fileImage.name.split('.').pop(),
+                imageSelectionHint: "",
+                imageLoadingError: false,
             });
         }
     }
@@ -65,7 +89,10 @@ export class DrinkPage extends Component {
                             </Button>
                             <Button color="danger"
                                 className="btn-drink-page"
-                                onClick={(evt) => { evt.preventDefault(); this.props.saveDrink(); }}>
+                                onClick={(evt) => {
+                                    evt.preventDefault();
+                                    this.props.saveDrink();
+                                }}>
                                 Закрыть
                             </Button>
                         </div>
@@ -79,8 +106,9 @@ export class DrinkPage extends Component {
                                     <Label for="drinkName" sm={12}>Название</Label>
                                     <Col sm={12}>
                                         <Input type="text" name="drinkName" id="drinkName" placeholder="Укажите название напитка"
+                                            className={(this.state.drinkNameErr === true) ? "input-invalid" : ""}
                                             value={this.state.drinkName}
-                                            onChange={(evt) => { this.changeValueField(evt) }} />
+                                            onChange={(evt) => { this.changeValueField(evt); this.setState({ drinkNameErr: false }); }} />
                                     </Col>
                                 </Row>
                             </FormGroup>
@@ -99,8 +127,9 @@ export class DrinkPage extends Component {
                                     <Label for="price" sm={12}>Цена</Label>
                                     <Col sm={12}>
                                         <Input name="price" id="price" placeholder="Укажите Цену"
+                                            className={(this.state.priceErr === true) ? "input-invalid" : ""}
                                             value={this.state.price}
-                                            onChange={(evt) => { this.changeValueField(evt) }} />
+                                            onChange={(evt) => { this.changeValueField(evt); this.setState({ priceErr: false }); }} />
                                     </Col>
                                 </Row>
                             </FormGroup>
@@ -110,11 +139,11 @@ export class DrinkPage extends Component {
                                     id="imageFile"
                                     name="imageFile"
                                     type="file"
-                                    accept=".png"
+                                    accept={imageExtensionFilter}
                                     onChange={(evt) => { this.onImageChange(evt) }}
                                 />
-                                <FormText>
-                                    Необходимо выбрать файл с расширением PNG.
+                                <FormText color={(this.state.imageLoadingError) ? "danger" : "" }>
+                                    {this.state.imageSelectionHint}
                                 </FormText>
                             </FormGroup>
                         </Col>
@@ -122,8 +151,8 @@ export class DrinkPage extends Component {
                             {(!(this.state.image == null) || !(this.state.imageInBase64 === null))
                                 && (<img
                                         alt="image of drink"
-                                        id="imageOfDrink"
-                                        src={this.state.imageChanged ? this.state.image : 'data:image/png;base64,' + this.state.imageInBase64}
+                                id="imageOfDrink"
+                                src={this.state.imageChanged ? this.state.image : 'data:image/' + this.state.imageExpansion + ';base64,' + this.state.imageInBase64}
                                         width="100%"
                                 />)}
                         </Col>
@@ -154,10 +183,30 @@ export class DrinkPage extends Component {
             description: data.description,
             price: data.price,
             imageInBase64: data.image,
+            imageExpansion: data.imageExpansion,
         });
     }
 
+    isInvalid() {
+        let err = false;
+
+        if (this.state.drinkName === "") {
+            this.setState({ drinkNameErr: true });
+            err = true;
+        }
+        if (this.state.price === 0) {
+            this.setState({ priceErr: true });
+            err = true;
+        }
+
+        return err;
+    }
+
     async saveDrink(date) {
+        if (this.isInvalid() === true) {
+            return;
+        }
+
         const response = await fetch('administration/saveDrink', {
             method: 'POST',
             headers: {
@@ -170,6 +219,7 @@ export class DrinkPage extends Component {
                 description: this.state.description,
                 price: this.state.price,
                 imageInBase64: this.state.imageChanged ? this.getImageAsBase64String() : this.state.imageInBase64,
+                imageExpansion: this.state.imageExpansion,
             })
         });
         const data = await response.json();

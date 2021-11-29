@@ -35,7 +35,6 @@ div.btn-coin-change {
     padding-top: 15px;
 }
 
-
 .btn-coin:active,
 .btn-coin:hover,
 .btn-coin:focus {
@@ -50,6 +49,11 @@ div.btn-coin-change {
     padding: 0;
     flex: 0 0 25%;
     max-width: 23%;
+}
+
+.drink-img {
+    width: 100%;
+    height: 150px;
 }
 
 .btn-confirmation-purchase {
@@ -68,7 +72,7 @@ div.btn-coin-change {
 }
 
 .info-about-change {
-    font-size: 1.3em;
+    font-size: 1.1em;
     color: red;
 }
 
@@ -82,4 +86,8 @@ div.btn-coin-change {
     font-weight: 700;
     margin: 2px;
     padding: 10px 20px;
+}
+
+.input-invalid {
+    border-color: #dc3545;
 }

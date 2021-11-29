@@ -131,7 +131,6 @@ export class AdministrationPage extends Component {
                                                                                         },
                                                                                         openFormForChangeBalance: true,
                                                                                     });
-                                                                                    console.log({ 'key': this.props.match.params['key'] });
                                                                                 }}>Изменить</Button>
                                                                         </Col>
                                                                     </Row>
@@ -302,8 +301,6 @@ export class AdministrationPage extends Component {
             this.populateListOfCoins();
             this.populateListOfDrinks();
         }
-
-        console.log({ 'authorizationCompleted': result });
     }
 
     async populateListOfCoins() {

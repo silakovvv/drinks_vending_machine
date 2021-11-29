@@ -82,6 +82,9 @@ namespace DrinksVendingMachine.Data.Migrations
                     b.Property<byte[]>("Image")
                         .HasColumnType("varbinary(max)");
 
+                    b.Property<string>("ImageExpansion")
+                        .HasColumnType("nvarchar(10)");
+
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
 

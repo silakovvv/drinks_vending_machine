@@ -12,10 +12,13 @@ namespace DrinksVendingMachine.Data.Models
         public int Id { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
-        public byte[] Image { get; set; }
         public decimal Price { get; set; }
         public int Amount { get; set; }
         public List<VendingMachineOperation> Operations { get; set; }
+        public byte[] Image { get; set; }
+
+        [Column(TypeName = "nvarchar(10)")]
+        public string ImageExpansion { get; set; }
 
         [NotMapped]
         public int Balance { get; set; }
